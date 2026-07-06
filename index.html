@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/denki-game/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>伝記 ― ベートーヴェン</title>
+    <script>
+      // ?bg 付きで開くと、非表示ページでもフレームループを回す(自動テスト用シム)
+      if (new URLSearchParams(location.search).has('bg')) {
+        const worker = new Worker(
+          URL.createObjectURL(new Blob(['setInterval(() => postMessage(0), 16)'])),
+        )
+        let cbs = []
+        window.requestAnimationFrame = (cb) => cbs.push(cb)
+        window.cancelAnimationFrame = () => {}
+        worker.onmessage = () => {
+          const list = cbs
+          cbs = []
+          for (const cb of list) cb(performance.now())
+        }
+        // 非表示ページでは ResizeObserver が発火しないため、レイアウト計測で代替する
+        window.ResizeObserver = class {
+          constructor(cb) {
+            this.cb = cb
+            this.ivs = []
+          }
+          observe(el) {
+            const measure = () => {
+              // getBoundingClientRect は transform 後の寸法を返す(force-landscape の回転で狂う)。
+              // 本物の ResizeObserver 同様、レイアウト上の寸法を使う
+              const w = el.clientWidth || el.getBoundingClientRect().width
+              const h = el.clientHeight || el.getBoundingClientRect().height
+              const rect = { x: 0, y: 0, top: 0, left: 0, right: w, bottom: h, width: w, height: h }
+              const size = [{ inlineSize: w, blockSize: h }]
+              this.cb(
+                [{ target: el, contentRect: rect, borderBoxSize: size, contentBoxSize: size }],
+                this,
+              )
+            }
+            setTimeout(measure, 0)
+            this.ivs.push(setInterval(measure, 500))
+          }
+          unobserve() {}
+          disconnect() {
+            this.ivs.forEach(clearInterval)
+            this.ivs = []
+          }
+        }
+      }
+    </script>
+    <script type="module" crossorigin src="/denki-game/assets/index-B6BCn2UH.js"></script>
+    <link rel="stylesheet" crossorigin href="/denki-game/assets/index-BRJ3mrWM.css">
+  <link rel="manifest" href="/denki-game/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/denki-game/registerSW.js"></script></head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
