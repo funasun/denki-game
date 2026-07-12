@@ -14,6 +14,7 @@ export const beethoven: PersonData = {
   name: 'ルートヴィヒ・ヴァン・ベートーヴェン',
   born: 1770,
   died: 1827,
+  tagline: '音を失ってなお、音楽を書きやめなかった人。',
   fate: { id: 'hearing', label: '聴力' },
   chapters: [chapter1, chapter2, chapter3, chapter4, chapter5, chapter6],
   chronicle,

@@ -23,16 +23,29 @@ export function OrientationGuard() {
   }, [])
 
   useEffect(() => {
+    // 強制横画面の on/off で #root の回転が入れ替わり、内部レイアウト(とくに3D Canvas)の
+    // 縦横が反転する。react-use-measure は resize を機に再計測するので、クラス切替のたびに
+    // 明示的に resize を発火させる。ResizeObserver 頼みだと端末によっては発火せず、
+    // Canvas が回転前のサイズのまま残って画面が見切れる(黒帯が出る)ため。
+    const nudgeResize = () => {
+      window.dispatchEvent(new Event('resize'))
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')))
+    }
+    const root = document.documentElement
     if (!portrait) {
       setForced(false)
       setCount(5)
-      document.documentElement.classList.remove('force-landscape')
+      if (root.classList.contains('force-landscape')) {
+        root.classList.remove('force-landscape')
+        nudgeResize()
+      }
       return
     }
     const iv = setInterval(() => setCount((c) => Math.max(0, c - 1)), 1000)
     const t = setTimeout(() => {
       setForced(true)
-      document.documentElement.classList.add('force-landscape')
+      root.classList.add('force-landscape')
+      nudgeResize()
     }, 5000)
     return () => {
       clearInterval(iv)

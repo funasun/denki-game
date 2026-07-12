@@ -1,9 +1,20 @@
-import type { ChapterData } from '../../engine/types'
+import type { ChapterData, SceneFigure } from '../../engine/types'
 
 // 第四章「傑作の森」— 1802年の遺書以後の創作の奔流と、1808年12月22日のアカデミー演奏会
 // 史実: 遺書後の多産期(英雄・熱情・ラズモフスキー・フィデリオほか) /
 // 1808年アン・デア・ウィーン劇場での自主演奏会(運命・田園の初演、4時間超、極寒、
-// 練習不足、合唱幻想曲の演奏事故とやり直し) / 会話の困難が進む
+// 練習不足、合唱幻想曲の演奏事故とやり直し、協奏曲第四番は作曲家自身の独奏) /
+// リハーサルでの楽団との不和(彼は練習から締め出され、別室で待たされた) / 会話の困難が進む
+
+const konzertmeister: SceneFigure = {
+  id: 'konzertmeister',
+  name: '楽師長',
+  position: [2.6, 0, -0.9],
+  facing: -1.4,
+  coat: '#3d3549',
+  hair: '#4a4038',
+}
+
 export const chapter4: ChapterData = {
   id: 'ch4-forest',
   title: '第四章　傑作の森',
@@ -20,6 +31,7 @@ export const chapter4: ChapterData = {
       sceneryId: 'concert-hall',
       ambience: ['roomtone'],
       playerAt: [0, 0, 0.5],
+      figures: [konzertmeister],
       lines: [
         {
           text: 'ハイリゲンシュタットの遺書から六年。生きると決めた男の中から、音楽が堰を切って溢れ出した。',
@@ -40,9 +52,119 @@ export const chapter4: ChapterData = {
       sceneryId: 'concert-hall',
       ambience: ['crowd'],
       spawn: [0, 0, 0.5],
+      goal: '開演まえ ── 舞台をたしかめ、楽師長と話す',
+      figures: [konzertmeister],
       exitLabel: '開演の刻',
       exitPosition: [-2.6, 0, 0.9],
       interactions: [
+        {
+          id: 'konzertmeister',
+          label: '楽師長と話す',
+          position: [2.6, 0.55, -0.9],
+          required: true,
+          conversation: {
+            start: 'root',
+            nodes: [
+              {
+                id: 'root',
+                lines: [
+                  {
+                    speaker: '楽師長',
+                    text: 'マエストロ。……ひとつだけ、申し上げておきます。楽員たちは、まだ先週の稽古のことを怒っております。今夜は、どうか──どうか、穏やかに。',
+                  },
+                ],
+                choices: [
+                  {
+                    text: '「練習は一度きりだ。保つと思うか」',
+                    to: 'worry',
+                    once: true,
+                  },
+                  {
+                    text: '「案ずるな。音はすべて、頭の中で鳴っている」',
+                    to: 'bold',
+                    flag: 'bold-words',
+                    once: true,
+                  },
+                  { text: 'うなずいて、持ち場へ送り出す', to: 'nod' },
+                ],
+              },
+              {
+                id: 'worry',
+                lines: [
+                  {
+                    speaker: '楽師長',
+                    text: '正直に申せば……最後の合唱幻想曲が、危のうございます。何しろ、楽譜が届いたのが数日前ですぞ。',
+                  },
+                  {
+                    speaker: 'ベートーヴェン',
+                    text: '崩れたら、止めて、頭からやり直すまでだ。',
+                  },
+                  {
+                    speaker: '楽師長',
+                    text: 'や、やり直す……?　お客の前で、でございますか!?',
+                  },
+                ],
+                choices: [
+                  {
+                    text: '「案ずるな。音はすべて、頭の中で鳴っている」',
+                    to: 'bold',
+                    flag: 'bold-words',
+                    once: true,
+                  },
+                  { text: '答えず、譜面台へ向き直る' },
+                ],
+              },
+              {
+                id: 'bold',
+                lines: [
+                  {
+                    speaker: 'ベートーヴェン',
+                    text: '案ずるな。耳のことは、お前たちも知っての通りだ。……だが音なら、すべて、この頭の中で鳴っている。楽員が迷ったら、私を見ろと伝えろ。',
+                  },
+                  {
+                    speaker: '楽師長',
+                    text: '……その言葉、信じますぞ、マエストロ。では──良い夜を。',
+                  },
+                ],
+              },
+              {
+                id: 'nod',
+                lines: [
+                  {
+                    speaker: '楽師長',
+                    text: '……武運を。今夜が、音楽の歴史に残る夜でありますように。',
+                  },
+                  { inner: true, text: '(残るとも。──残す以外に、開く理由がない。)' },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          id: 'fortepiano',
+          label: 'フォルテピアノで独奏部をさらう',
+          position: [-2.3, 0, -0.5],
+          activity: {
+            kind: 'piano',
+            prompt:
+              '今夜は協奏曲第四番も初演する。独奏は、私だ。──静かな開幕の一節を、指でたしかめておく。',
+            phrase: ['B3', 'B3', 'B3', 'C4', 'D4', 'G4'],
+            keys: ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4'],
+            reflection: [
+              {
+                inner: true,
+                text: 'ト長調。オーケストラの総奏ではなく、独奏ピアノのささやきから始まる協奏曲──こんな開幕は、まだ誰もやっていない。',
+              },
+              {
+                inner: true,
+                text: '客はざわめくだろう。「もう始まったのか?」と。……それでいい。ささやきにこそ、耳を澄ませさせるのだ。',
+              },
+              {
+                text: '人前で協奏曲を弾くのは、これが最後になる。──彼の耳は、もう独奏者の耳ではなくなりつつあった。',
+              },
+            ],
+          },
+        },
         {
           id: 'podium',
           label: '指揮台に立つ',
@@ -93,6 +215,7 @@ export const chapter4: ChapterData = {
       sceneryId: 'concert-hall',
       ambience: ['roomtone'],
       playerAt: [0, 0, 0.5],
+      figures: [konzertmeister],
       lines: [
         { text: '演奏会は、伝説的な混乱になった。' },
         {
@@ -100,6 +223,11 @@ export const chapter4: ChapterData = {
         },
         {
           text: 'それでも──この夜、「運命」と「田園」は確かに世界に生まれ落ちた。居合わせた者の中には、寒さも事故も忘れて、ただ茫然と座り尽くす者がいた。',
+        },
+        {
+          inner: true,
+          ifFlag: 'bold-words',
+          text: '(「音はすべて頭の中で鳴っている」──開演前の、あの言葉。……嘘ではなかった。それだけは、確かだ。)',
         },
         {
           inner: true,

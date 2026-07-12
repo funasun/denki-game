@@ -1,4 +1,4 @@
-import { AMBIENCES, ONESHOTS, footstep } from './synth'
+import { AMBIENCES, ONESHOTS, footstep, playPianoTone } from './synth'
 
 // 運命パラメータ(聴力 0-1)を音響写像に変換する共通エンジン。
 // 全音源は input → lowpass → hearingGain → master を必ず通る。
@@ -87,6 +87,12 @@ class AudioEngine {
     const fn = ONESHOTS[id]
     if (!fn) return 0
     return fn(this.ctx, this.input)
+  }
+
+  // 単音を鳴らす(その場で鍵盤を弾く行為用)。input を通すので聴力で音がこもる。
+  playNote(noteName: string, dur = 1.6, vel = 0.9): number {
+    if (!this.ctx) return 0
+    return playPianoTone(this.ctx, this.input, noteName, dur, vel)
   }
 
   footstep() {

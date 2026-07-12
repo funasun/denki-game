@@ -1,10 +1,28 @@
-import type { ChapterData } from '../../engine/types'
+import type { ChapterData, SceneFigure } from '../../engine/types'
 
 // 終章「嵐」— 1827年3月、シュヴァルツシュパニアハウスでの最期
 // 史実: 腹水穿刺を四度受ける / ロンドン・フィルハーモニック協会からの見舞金百ポンド /
+// 旧友ブロイニングの息子ゲルハルト(渾名「ズボンのボタン」)が学校帰りにほぼ毎日見舞った /
 // 出版社からのライン産ワインが死の二日前に届き「残念、遅すぎた」と言ったと伝わる /
 // 3月26日夕刻、雷鳴の中、拳を挙げて息を引き取ったというヒュッテンブレンナーの証言 /
-// 枕元には交響曲第十番の断片 / 葬儀には約二万人が集まり、シューベルトが松明を持った
+// 枕元には交響曲第十番の断片 / 遺書と「不滅の恋人」への手紙は死後、机の隠し引き出しから発見 /
+// 葬儀には約二万人が集まり、シューベルトが松明を持った
+
+const gerhard: SceneFigure = {
+  id: 'gerhard',
+  name: 'ゲルハルト',
+  position: [0.9, 0, -1.1],
+  facing: -0.4,
+  coat: '#4e5a68',
+  hair: '#8a6a3c',
+  scale: 0.75,
+}
+
+// 臨終の夕、枕辺に居合わせたふたり(名は語られない)
+const watchers: SceneFigure[] = [
+  { id: 'watcher-a', position: [-0.6, 0, -1.6], facing: -Math.PI / 2, coat: '#2c2620' },
+  { id: 'watcher-b', position: [-1.6, 0, 0.55], facing: Math.PI, coat: '#3a3028' },
+]
 export const chapter6: ChapterData = {
   id: 'ch6-storm',
   title: '終章　嵐',
@@ -21,6 +39,7 @@ export const chapter6: ChapterData = {
       sceneryId: 'death-room',
       ambience: ['storm'],
       playerAt: [0, 0, 1.0],
+      figures: [gerhard],
       lines: [
         {
           text: '一八二七年、三月。「黒いスペイン人の館」と呼ばれる建物の二階で、ベートーヴェンは三カ月あまり病床にあった。',
@@ -39,21 +58,126 @@ export const chapter6: ChapterData = {
       sceneryId: 'death-room',
       ambience: ['storm'],
       spawn: [0, 0, 1.0],
+      goal: '病床の午後 ── 少年と話し、身のまわりを見ておく',
+      figures: [gerhard],
       exitLabel: '床に戻る',
       exitPosition: [-0.6, 0, 0.6],
       interactions: [
         {
+          id: 'gerhard',
+          label: 'ゲルハルトの相手をする',
+          position: [0.9, 0.45, -1.1],
+          required: true,
+          conversation: {
+            start: 'root',
+            nodes: [
+              {
+                id: 'root',
+                lines: [
+                  {
+                    text: '学校鞄を抱えた少年が、椅子から飛び降りた。旧友ブロイニングの息子、ゲルハルト。会話帳に、丸い字が躍る。',
+                  },
+                  {
+                    speaker: 'ゲルハルト',
+                    text: 'せんせい、きょうは顔いろがいいです!　母さまから、杏の砂糖煮をあずかってきました。',
+                  },
+                ],
+                choices: [
+                  { text: '「学校はどうだ」と訊く', to: 'school', once: true },
+                  {
+                    text: '「なぜ毎日来るのだ」と訊く',
+                    to: 'why',
+                    flag: 'gerhard-visits',
+                    once: true,
+                  },
+                  { text: '「じきに嵐が来る。もう帰りなさい」', to: 'rest' },
+                ],
+              },
+              {
+                id: 'school',
+                lines: [
+                  {
+                    speaker: 'ゲルハルト',
+                    text: 'ピアノのおけいこが、うまくいきません。はやく弾こうとすると、ゆびがもつれてしまうのです。',
+                  },
+                  {
+                    speaker: 'ベートーヴェン',
+                    text: 'うまく弾こうとするな。何を言いたいのか、それだけを考えなさい。指は、あとからついてくる。',
+                  },
+                  { text: '少年は目を丸くして、その言葉を会話帳の隅に、大事そうに書き写した。' },
+                ],
+                choices: [
+                  {
+                    text: '「なぜ毎日来るのだ」と訊く',
+                    to: 'why',
+                    flag: 'gerhard-visits',
+                    once: true,
+                  },
+                  { text: '「じきに嵐が来る。もう帰りなさい」', to: 'rest' },
+                ],
+              },
+              {
+                id: 'why',
+                lines: [
+                  {
+                    speaker: 'ゲルハルト',
+                    text: 'だって、せんせいがぼくを「ズボンのボタン」と呼ぶからです。ボタンは、まいにち、ちゃんとついていなくてはいけません。',
+                  },
+                  {
+                    speaker: 'ベートーヴェン',
+                    text: '──は、はは。理屈だな。そうとも、お前は私のボタンだ。取れてもらっては、困る。',
+                  },
+                  { text: '病室に、ひさしぶりに笑い声が転がった。' },
+                ],
+                choices: [{ text: '「じきに嵐が来る。もう帰りなさい」', to: 'rest' }],
+              },
+              {
+                id: 'rest',
+                lines: [
+                  {
+                    speaker: 'ゲルハルト',
+                    text: '……はい。でも、あした学校がおわったら、また来ますからね。ぜったいです。',
+                  },
+                  {
+                    inner: true,
+                    text: '(ぜったい、か。……子どもの「ぜったい」ほど、信じてみたくなるものはない。)',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
           id: 'manuscript',
-          label: '枕元の楽譜に手を伸ばす',
+          label: '枕元の小机を見る',
           position: [-2.4, 0, 0.5],
           required: true,
-          lines: [
-            { text: '小机の上に、走り書きの五線紙が積まれている。──交響曲第十番。その、断片。' },
-            {
-              inner: true,
-              text: 'まだある。頭の中で、まだ鳴っているものがある。第九の先へ行く音が。……時間が、足りん。',
-            },
-          ],
+          examine: {
+            title: '枕元の小机',
+            intro: '手の届くところに、彼の最後の世界が載っている。',
+            doneLabel: '目を閉じる',
+            hotspots: [
+              {
+                id: 'tenth',
+                label: '走り書きの五線紙',
+                observation:
+                  '交響曲第十番──その断片。まだある。頭の中で、まだ鳴っているものがある。第九の、先へ行く音が。……時間が、足りん。',
+              },
+              {
+                id: 'book',
+                label: '使い込まれた会話帳',
+                observation:
+                  '客の言葉は皆ここに書かれ、私は声で答えた。この十年の私の「会話」は、すべてこの帳面の中にある。……音のない対話とは、存外、嘘のつけないものだ。',
+              },
+              {
+                id: 'drawer',
+                label: '小机の引き出し',
+                hidden: true,
+                observation:
+                  '奥に、古い紙束。──二十五年前、ハイリゲンシュタットで弟たちに宛てて書いた遺書。そして、宛名のない恋文。どちらも出さなかった。どちらも、捨てられなかった。……それが、私という人間の答えだ。',
+              },
+            ],
+          },
         },
         {
           id: 'wine',
@@ -89,9 +213,14 @@ export const chapter6: ChapterData = {
       sceneryId: 'death-room',
       ambience: ['storm'],
       playerAt: [0, 0, 1.0],
+      figures: watchers,
       lines: [
         { text: '三月二十六日、午後。空は鉛色に閉ざされ、雷を孕んだ雪嵐がウィーンを覆った。' },
         { text: '彼は前日から昏睡のうちにあった。枕辺に居合わせたのは、わずかふたり。' },
+        {
+          ifFlag: 'gerhard-visits',
+          text: '毎日通いつめた「ズボンのボタン」の少年は、その場にいなかった。──少年はのちに、この館での日々を一冊の回想録に書き残す。晩年の彼を伝える、いちばん温かい記録である。',
+        },
         {
           text: '夕刻──ひときわ強い雷光が部屋を貫き、雷鳴が轟いたその時。昏睡の中の彼が、かっと目を見開き、右の拳を高く突き上げた。──居合わせた者は、のちにそう証言している。',
         },

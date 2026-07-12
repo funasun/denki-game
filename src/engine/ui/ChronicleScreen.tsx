@@ -25,6 +25,14 @@ export function ChronicleScreen({ person, onClose }: { person: PersonData; onClo
     [],
   )
 
+  // 音楽家以外(works 未定義)では「作品」タブを出さない
+  const hasWorks = !!person.works?.length
+  const tabDefs: [Tab, string][] = [
+    ['chronicle', '年譜'],
+    ...(hasWorks ? ([['works', '作品']] as [Tab, string][]) : []),
+    ['figures', '人物録'],
+  ]
+
   const play = (w: WorkDef, asHim: boolean) => {
     if (playing) return
     audio.ensureStarted()
@@ -48,13 +56,7 @@ export function ChronicleScreen({ person, onClose }: { person: PersonData; onClo
       </p>
 
       <div className="archive-tabs">
-        {(
-          [
-            ['chronicle', '年譜'],
-            ['works', '作品'],
-            ['figures', '人物録'],
-          ] as [Tab, string][]
-        ).map(([t, label]) => (
+        {tabDefs.map(([t, label]) => (
           <button
             key={t}
             className={`archive-tab${tab === t ? ' active' : ''}`}
@@ -84,7 +86,7 @@ export function ChronicleScreen({ person, onClose }: { person: PersonData; onClo
             <p className="archive-note">
               「彼の耳で」は、作曲された年の聴力でこの断片を聴きます。
             </p>
-            {person.works.map((w) => (
+            {person.works?.map((w) => (
               <div key={w.id} className="work-row">
                 <div className="work-head">
                   <span className="work-title">{w.title}</span>

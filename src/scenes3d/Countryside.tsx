@@ -74,10 +74,7 @@ export function Countryside() {
         </group>
       ))}
 
-      {/* 弟子リース(同行者) */}
-      <group position={[0.9, 0, -13.5]} rotation={[0, Math.PI, 0]}>
-        <Figure coat="#5a4a6a" hair="#7a5c38" />
-      </group>
+      {/* リースなどの同行者はビートのデータ(figures)が置く */}
 
       {/* 遠くの羊飼いと羊(笛の主) */}
       <group position={[-11, 0, -26]}>

@@ -1,5 +1,3 @@
-import { Figure } from '../engine/scene3d/Figure'
-
 // ボン、ボンガッセの生家の屋根裏部屋(夜)── 幼年期の特訓の場
 export function BonnRoom() {
   const wall = '#4a4034'
@@ -101,10 +99,7 @@ export function BonnRoom() {
         </mesh>
       </group>
 
-      {/* 父ヨハン(クラヴィーアの傍らに立つ) */}
-      <group position={[-0.55, 0, -0.4]} rotation={[0, -Math.PI / 2.6, 0]}>
-        <Figure coat="#6a3038" hair="#4a3826" />
-      </group>
+      {/* 人物はビートのデータ(figures)が置く ── 場面によって居たり居なかったりするため */}
 
       {/* 卓上の蝋燭 */}
       <mesh position={[-1.05, 0.84, -1.7]}>

@@ -83,15 +83,36 @@ export function ConcertHall() {
         <meshStandardMaterial color="#4a3826" flatShading />
       </mesh>
 
+      {/* 独奏用のフォルテピアノ(一八〇八年の演奏会では協奏曲第四番も初演された) */}
+      <group position={[-2.3, 0, -1.6]}>
+        <mesh position={[0, 0.72, 0]} castShadow>
+          <boxGeometry args={[1.5, 0.22, 0.66]} />
+          <meshStandardMaterial color="#2e2018" flatShading />
+        </mesh>
+        <mesh position={[0, 0.78, 0.3]}>
+          <boxGeometry args={[1.36, 0.06, 0.14]} />
+          <meshStandardMaterial color="#e8e0cc" />
+        </mesh>
+        {[-0.6, 0.6].map((x) => (
+          <mesh key={x} position={[x, 0.31, 0.18]}>
+            <cylinderGeometry args={[0.05, 0.06, 0.62, 6]} />
+            <meshStandardMaterial color="#2e2018" flatShading />
+          </mesh>
+        ))}
+        {/* 独奏者の丸椅子 */}
+        <mesh position={[0, 0.26, 0.62]}>
+          <cylinderGeometry args={[0.17, 0.19, 0.5, 6]} />
+          <meshStandardMaterial color="#3a2c1e" flatShading />
+        </mesh>
+      </group>
+
       {/* オーケストラ */}
       {orchestraRows.map(([x, y, z], i) => (
         <Musician key={i} position={[x, y, z]} rotation={((i * 37) % 20) / 40 - 0.25} />
       ))}
 
-      {/* 独唱者たち(舞台の右手前) */}
-      <group position={[2.6, 0, -0.9]} rotation={[0, -0.4, 0]}>
-        <Figure coat="#6a2f3c" hair="#3a2c1c" />
-      </group>
+      {/* 独唱者(舞台の右手前)。もう一人ぶんの立ち位置 [2.6,-0.9] は、
+          ビートのデータ(figures)が名札つきの人物を置く場所として空けてある */}
       <group position={[3.2, 0, -1.4]} rotation={[0, -0.3, 0]}>
         <Figure coat="#2c3a55" hair="#26201a" />
       </group>

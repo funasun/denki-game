@@ -247,6 +247,21 @@ const NOTE: Record<string, number> = {
   C5: 523.25, 'C#5': 554.37, D5: 587.33, 'D#5': 622.25, E5: 659.25, F5: 698.46,
 }
 
+// 単音のピアノ ── その場で鍵盤を押す行為(ActivityDef.piano)用。
+// dest に聴力チェーンの input を渡すので、耳が悪ければこの一音もこもって遠ざかる。
+export function playPianoTone(
+  ctx: AudioContext,
+  dest: AudioNode,
+  noteName: string,
+  dur = 1.6,
+  vel = 0.9,
+): number {
+  const freq = NOTE[noteName]
+  if (!freq) return 0
+  pianoNote(ctx, dest, freq, ctx.currentTime + 0.02, dur, vel)
+  return dur
+}
+
 function pianoFragment(ctx: AudioContext, dest: AudioNode): number {
   // ニ短調の静かな分散和音 → 和音(自作の短い断片)
   const t0 = ctx.currentTime + 0.05

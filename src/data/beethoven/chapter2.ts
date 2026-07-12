@@ -1,9 +1,19 @@
-import type { ChapterData } from '../../engine/types'
+import type { ChapterData, SceneFigure } from '../../engine/types'
 
 // 第二章「ウィーンへ」— 1792年の旅立ちから1798年ごろの最初の耳鳴りまで
 // 史実: 1792年11月、革命戦争の迫る中をボンから出立(以後、故郷に戻ることはなかった) /
 // ヴァルトシュタイン伯の餞別の言葉 / ハイドンへの師事と不和 / 即興演奏の名手として台頭 /
 // 1798年ごろから耳鳴り・難聴の自覚(1801年ヴェーゲラー宛の手紙で告白)
+
+const coachman: SceneFigure = {
+  id: 'coachman',
+  name: '御者',
+  position: [2.3, 0, -7.6],
+  facing: Math.PI + 0.5,
+  coat: '#4a4a52',
+  hair: '#5c5648',
+}
+
 export const chapter2: ChapterData = {
   id: 'ch2-vienna',
   title: '第二章　ウィーンへ',
@@ -20,12 +30,13 @@ export const chapter2: ChapterData = {
       sceneryId: 'vienna-road',
       ambience: ['wind', 'birds'],
       playerAt: [0, 0, -3],
+      figures: [coachman],
       lines: [
         {
           text: '一七九二年十一月。二十一歳のベートーヴェンは、駅馬車に揺られてボンを発った。西の空には戦争の気配──フランス革命軍が、ラインへ向かって進んでいた。',
         },
         {
-          text: '行き先は、六百キロ先の帝都ウィーン。老大家ハイドンに弟子入りするための、二度目の、そして今度こそ後戻りのない旅だった。',
+          text: '行き先は、七百キロの彼方の帝都ウィーン。老大家ハイドンに弟子入りするための、二度目の、そして今度こそ後戻りのない旅だった。',
         },
         {
           text: '旅立ちの前、後援者ヴァルトシュタイン伯爵は、彼の記念帳にこう書き贈った。──「絶え間ない精進によって、モーツァルトの精神を、ハイドンの手から受け取りたまえ」。',
@@ -38,6 +49,8 @@ export const chapter2: ChapterData = {
       sceneryId: 'vienna-road',
       ambience: ['wind', 'birds'],
       spawn: [0, 0, -3],
+      goal: '出立まえ ── 街道で旅支度をたしかめる',
+      figures: [coachman],
       exitLabel: '馬車に乗り込む',
       exitPosition: [1.0, 0, -6.2],
       interactions: [
@@ -46,18 +59,38 @@ export const chapter2: ChapterData = {
           label: '旅行鞄を確かめる',
           position: [1.6, 0, -4.6],
           required: true,
-          lines: [
-            {
-              text: '鞄の中身は、書きためた楽譜の束、ネーフェ先生からの推薦の手紙、それから僅かな着替え。',
-            },
-            {
-              inner: true,
-              text: '父は先月、世を去った。弟たちも、もう自分の足で立てる。……ボンに、私を引き留めるものはもうない。',
-            },
-            {
-              text: '彼はこのとき知る由もなかったが、生涯、二度と故郷ボンの土を踏むことはなかった。',
-            },
-          ],
+          examine: {
+            title: '旅行鞄',
+            intro: '鞄ひとつに、これからの人生のぜんぶが入っている。ひとつずつ、たしかめる。',
+            hotspots: [
+              {
+                id: 'scores',
+                label: '書きためた楽譜の束',
+                observation:
+                  'ボンで書いた歌曲、変奏曲、カンタータ。まだ「作品一」と名乗れるものは、ひとつもない。……これから書く。全部、あの都で。',
+              },
+              {
+                id: 'letter',
+                label: 'ネーフェ先生の推薦状',
+                observation:
+                  '最初の師ネーフェ先生の手紙。先生は十二歳の私を雑誌でこう紹介してくれた──「この少年は、第二のモーツァルトになるだろう」と。……その予言を、ほんとうにする番だ。',
+              },
+              {
+                id: 'clothes',
+                label: 'わずかな着替え',
+                observation:
+                  '着替えは数えるほど。父は先月世を去り、弟たちももう自分の足で立てる。ボンに引き留めるものは、なにもない。──このとき彼は知る由もないが、生涯、二度と故郷の土を踏むことはなかった。',
+              },
+              {
+                id: 'album',
+                label: '鞄の底の記念帳',
+                hidden: true,
+                observation:
+                  '底に、ヴァルトシュタイン伯爵の記念帳。「絶え間ない精進によって、モーツァルトの精神を、ハイドンの手から受け取りたまえ」──受け取るとも。そしていつか、追い越す。それしか、この餞別への返しかたを知らない。',
+              },
+            ],
+            doneLabel: '鞄を閉じる',
+          },
         },
         {
           id: 'milestone',
@@ -74,17 +107,84 @@ export const chapter2: ChapterData = {
         {
           id: 'coachman',
           label: '御者と言葉を交わす',
-          position: [2.3, 0, -7.6],
-          lines: [
-            {
-              speaker: '御者',
-              text: '急ぎますぜ、旦那。革命軍がラインを越えたって話だ。ぐずぐずしてると、道が軍隊で塞がっちまう。',
-            },
-            {
-              speaker: 'ベートーヴェン',
-              text: '構わん、飛ばしてくれ。……世界がひっくり返るなら、それも結構。音楽もひっくり返せばいい。',
-            },
-          ],
+          position: [2.3, 0.55, -7.6],
+          required: true,
+          conversation: {
+            start: 'root',
+            nodes: [
+              {
+                id: 'root',
+                lines: [
+                  {
+                    speaker: '御者',
+                    text: '急ぎますぜ、旦那。革命軍がラインを越えたって話だ。ぐずぐずしてると、道が軍隊で塞がっちまう。',
+                  },
+                ],
+                choices: [
+                  {
+                    text: 'ウィーンとは、どんな都だ',
+                    to: 'vienna',
+                    flag: 'asked-vienna',
+                    once: true,
+                  },
+                  { text: '戦争は、どうなると思う', to: 'war', once: true },
+                  { text: '急いでくれ、とだけ言う', to: 'go' },
+                ],
+              },
+              {
+                id: 'vienna',
+                lines: [
+                  {
+                    speaker: '御者',
+                    text: 'あっしは何べんも行きましたがね。ありゃあ、でかい渦ですよ。人も、金も、音楽も、みいんな呑み込んじまう。',
+                  },
+                  {
+                    speaker: '御者',
+                    text: '「都は人を呑む」って言いましてね。呑まれた奴から、順に消えていく。──旦那、呑まれなさんなよ。',
+                  },
+                ],
+                choices: [
+                  { text: '「呑まれる側になる気はない」', to: 'laugh', once: true },
+                  { text: 'だまって、東の空を見る' },
+                ],
+              },
+              {
+                id: 'laugh',
+                lines: [
+                  {
+                    speaker: 'ベートーヴェン',
+                    text: '呑まれる?　冗談じゃない。私が、呑む側だ。',
+                  },
+                  {
+                    speaker: '御者',
+                    text: 'ハッ──いい面構えだ。そんなら旦那、じきに着きまさあ。',
+                  },
+                ],
+              },
+              {
+                id: 'war',
+                lines: [
+                  {
+                    speaker: '御者',
+                    text: 'さあね。だが、王さまの首が飛ぶ時代だ。えらい人がえらいまま、って決まりは、もう無いんでしょうよ。',
+                  },
+                  {
+                    inner: true,
+                    text: '(生まれではなく、力で立つ時代。……悪くない。)',
+                  },
+                ],
+              },
+              {
+                id: 'go',
+                lines: [
+                  {
+                    speaker: 'ベートーヴェン',
+                    text: '構わん、飛ばしてくれ。……世界がひっくり返るなら、それも結構。音楽もひっくり返せばいい。',
+                  },
+                ],
+              },
+            ],
+          },
         },
       ],
     },
@@ -95,6 +195,11 @@ export const chapter2: ChapterData = {
       playerAt: [0, 0, -12],
       lines: [
         { text: 'ウィーン。音楽の都は、無名の青年をすぐには迎え入れなかった。' },
+        {
+          inner: true,
+          ifFlag: 'asked-vienna',
+          text: '(あの御者は「都は人を呑む」と笑っていた。……呑まれてたまるか。)',
+        },
         {
           text: 'ハイドンの教えは丁寧すぎて退屈だった。彼は隠れて別の教師にも学び、老大家と時にぶつかった。だが夜のサロンは、別だった。',
         },

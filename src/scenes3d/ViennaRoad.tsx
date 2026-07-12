@@ -1,5 +1,3 @@
-import { Figure } from '../engine/scene3d/Figure'
-
 // ボンからウィーンへの街道(晩秋)── 休憩中の駅馬車と、遠くの帝都
 function AutumnTree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   return (
@@ -128,10 +126,7 @@ export function ViennaRoad() {
         </mesh>
       </group>
 
-      {/* 御者(馬車のそばで一服) */}
-      <group position={[2.3, 0, -7.6]} rotation={[0, Math.PI + 0.5, 0]}>
-        <Figure coat="#4a4a52" hair="#5c5648" />
-      </group>
+      {/* 御者などの人物はビートのデータ(figures)が置く */}
 
       {/* 照明(晩秋の低い陽) */}
       <ambientLight intensity={0.55} color="#f2e6c8" />

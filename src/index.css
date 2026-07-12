@@ -135,6 +135,45 @@ html.force-landscape #root {
   grid-area: 3 / 2;
 }
 
+/* ---- 全画面ボタン(タッチ端末・全画面でないときだけ表示) ---- */
+.fullscreen-toggle {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(232, 224, 204, 0.82);
+  background: rgba(20, 17, 13, 0.62);
+  border: 1px solid rgba(201, 169, 92, 0.42);
+  border-radius: 999px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 60;
+}
+
+.fullscreen-toggle:active {
+  background: rgba(201, 169, 92, 0.25);
+}
+
+.fullscreen-toggle-glyph {
+  font-size: 15px;
+  line-height: 1;
+}
+
+@media (pointer: coarse) {
+  .fullscreen-toggle {
+    display: inline-flex;
+  }
+}
+
 .game-root canvas {
   display: block;
 }
@@ -146,11 +185,16 @@ html.force-landscape #root {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* 内容が画面より高いときは中央寄せをやめて上端から並べ、スクロールで全部読めるようにする。
+     safe を付けないと flex 中央寄せは上端を画面外へ押し出し、ボタン等が見切れて触れなくなる。 */
   justify-content: center;
+  justify-content: safe center;
   gap: 28px;
   background: radial-gradient(ellipse at center, #221e18 0%, #0d0b09 75%);
   text-align: center;
   padding: 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   animation: fadein 1.6s ease;
 }
 
@@ -238,6 +282,37 @@ html.force-landscape #root {
 
 .ending-actions .card-button {
   margin-top: 0;
+}
+
+/* 低い画面(スマホ横)ではタイトル・章結びを詰めて、なるべく1画面に収める
+   (収まらないぶんは .fullscreen-card のスクロールで到達できる) */
+@media (max-height: 480px) {
+  .fullscreen-card {
+    gap: 16px;
+    padding: 18px 24px;
+  }
+  .ending-lines {
+    gap: 12px;
+  }
+  .ending-lines p {
+    font-size: 13.5px;
+    line-height: 1.85;
+  }
+  .ending-payoff {
+    padding-top: 14px;
+    gap: 7px;
+  }
+  .payoff-title {
+    font-size: 17px;
+  }
+  .payoff-text {
+    font-size: 13px;
+    line-height: 1.85;
+  }
+  .card-button {
+    margin-top: 12px;
+    padding: 10px 32px;
+  }
 }
 
 /* ---- 生涯の記録(年譜・作品・人物録)・章選択 ---- */
@@ -501,6 +576,173 @@ html.force-landscape #root {
   border-bottom-color: var(--gold);
 }
 
+/* ---- ホーム: 伝記ゲーム集(導入 + 人物選択) ---- */
+.home-screen {
+  justify-content: flex-start;
+  gap: 26px;
+  padding: 46px 24px 36px;
+  overflow-y: auto;
+}
+
+.home-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 720px;
+}
+
+.home-eyebrow {
+  font-size: 12.5px;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  text-indent: 0.4em;
+}
+
+.home-title {
+  font-size: clamp(26px, 4.6vw, 46px);
+}
+
+.home-lead {
+  font-size: 14px;
+  line-height: 2.05;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+  max-width: 620px;
+  text-align: center;
+}
+
+.person-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+  gap: 16px;
+  width: min(760px, 94vw);
+}
+
+.person-card {
+  font-family: var(--serif);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  color: var(--ink);
+  background: rgba(201, 169, 92, 0.05);
+  border: 1px solid rgba(201, 169, 92, 0.28);
+  padding: 20px 22px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.person-card:hover {
+  background: rgba(201, 169, 92, 0.13);
+  border-color: var(--gold);
+  transform: translateY(-3px);
+}
+
+.person-card-life {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+
+.person-card-name {
+  font-size: 19px;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+
+.person-card-tagline {
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-dim);
+}
+
+.person-card-status {
+  margin-top: 6px;
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+
+.person-card-status.done {
+  color: #a9b4d6;
+}
+
+.person-card.upcoming {
+  cursor: default;
+  opacity: 0.55;
+  border-style: dashed;
+}
+
+.person-card.upcoming:hover {
+  transform: none;
+  background: rgba(201, 169, 92, 0.05);
+  border-color: rgba(201, 169, 92, 0.28);
+}
+
+.upcoming-badge {
+  margin-top: 6px;
+  font-size: 11.5px;
+  letter-spacing: 0.24em;
+  color: var(--ink-dim);
+  border: 1px solid rgba(179, 169, 142, 0.4);
+  padding: 3px 12px;
+}
+
+.home-foot {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  line-height: 1.9;
+  color: var(--ink-dim);
+  max-width: 560px;
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* ゲート脚部: いつでもコレクションへ戻れる導線 */
+.gate-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.home-link {
+  letter-spacing: 0.2em;
+  opacity: 0.85;
+}
+
+/* スマホ横(低い画面)ではホームを詰めてスクロール量を減らす */
+@media (max-height: 480px) {
+  .home-screen {
+    padding: 20px 24px;
+    gap: 16px;
+  }
+  .home-title {
+    font-size: 24px;
+  }
+  .home-lead {
+    font-size: 12.5px;
+    line-height: 1.85;
+  }
+  .home-header {
+    gap: 8px;
+  }
+  .person-card {
+    padding: 14px 18px;
+    gap: 6px;
+  }
+  .person-card-name {
+    font-size: 17px;
+  }
+  .home-foot {
+    font-size: 11px;
+  }
+}
+
 /* ---- 会話 ---- */
 .dialogue-layer {
   position: fixed;
@@ -558,10 +800,13 @@ html.force-landscape #root {
   inset: 0;
   display: flex;
   align-items: center;
+  align-items: safe center;
   justify-content: center;
   background: rgba(8, 7, 5, 0.72);
   padding: 24px;
   z-index: 30;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   animation: fadein 0.8s ease;
 }
 
@@ -685,6 +930,618 @@ html.force-landscape #root {
   margin-top: 12px;
 }
 
+/* ---- 推理(inquiry): 集めた手がかりから読み解く ---- */
+.dossier {
+  border: 1px solid rgba(201, 169, 92, 0.22);
+  background: rgba(201, 169, 92, 0.04);
+  padding: 16px 20px 18px;
+  margin-bottom: 26px;
+}
+
+.dossier-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.dossier-count {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--paper);
+  background: var(--gold);
+  border-radius: 999px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dossier-intro {
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-dim);
+  margin-bottom: 14px;
+}
+
+.dossier-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dossier-item {
+  border-left: 2px solid rgba(201, 169, 92, 0.5);
+  padding: 2px 0 2px 14px;
+}
+
+.dossier-item-title {
+  display: block;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+
+.dossier-item-note {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--ink-dim);
+}
+
+.dossier-empty {
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-dim);
+}
+
+/* ---- 推理の結び(verdict): 事実 / 推定 / 解釈 を分けて示す ---- */
+.verdict-reading-block {
+  margin-bottom: 26px;
+}
+
+.verdict-support {
+  font-size: 14.5px;
+  line-height: 1.95;
+  margin-top: 8px;
+}
+
+.verdict-links {
+  margin-top: 14px;
+  padding: 10px 0 2px 14px;
+  border-left: 2px solid rgba(201, 169, 92, 0.5);
+}
+
+.verdict-links-label {
+  display: block;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.verdict-links-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.verdict-links-list li {
+  font-size: 12.5px;
+  color: var(--ink);
+  background: rgba(201, 169, 92, 0.1);
+  border: 1px solid rgba(201, 169, 92, 0.32);
+  padding: 3px 11px;
+  border-radius: 999px;
+}
+
+.verdict-layer {
+  padding: 12px 0 12px 18px;
+  margin-bottom: 16px;
+  border-left: 3px solid var(--gold);
+}
+
+.verdict-layer-tag {
+  display: block;
+  font-size: 11.5px;
+  letter-spacing: 0.24em;
+  margin-bottom: 8px;
+}
+
+.verdict-layer-body {
+  font-size: 14px;
+  line-height: 2.02;
+  margin-bottom: 12px;
+}
+
+.verdict-layer-body:last-child {
+  margin-bottom: 0;
+}
+
+/* 記録された事実 — 揺るがぬ金 */
+.verdict-record {
+  border-left-color: #c9a95c;
+  background: rgba(201, 169, 92, 0.05);
+}
+.verdict-record .verdict-layer-tag {
+  color: #d8bd76;
+}
+
+/* 歴史家の推定 — 冷たい石青 */
+.verdict-inference {
+  border-left-color: #8496b8;
+  background: rgba(132, 150, 184, 0.06);
+}
+.verdict-inference .verdict-layer-tag {
+  color: #9fb0cf;
+}
+
+/* この物語の解釈 — 想像のテラコッタ */
+.verdict-reading {
+  border-left-color: #c0806e;
+  background: rgba(192, 128, 110, 0.06);
+}
+.verdict-reading .verdict-layer-tag {
+  color: #d19685;
+}
+
+@media (max-height: 480px) {
+  .dossier {
+    padding: 11px 14px 13px;
+    margin-bottom: 16px;
+  }
+  .dossier-heading {
+    margin-bottom: 8px;
+  }
+  .verdict-reading-block {
+    margin-bottom: 16px;
+  }
+  .verdict-layer {
+    padding: 8px 0 8px 13px;
+    margin-bottom: 11px;
+  }
+  .verdict-layer-body {
+    font-size: 13px;
+    line-height: 1.85;
+  }
+}
+
+/* ======== 相互作用の様式(調べ込み / 対話 / 行為)共通の枠 ======== */
+.examine-panel,
+.conversation-panel,
+.activity-panel {
+  width: min(680px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--paper-panel);
+  border: 1px solid rgba(201, 169, 92, 0.4);
+  padding: 34px 40px;
+}
+
+/* ---- 調べ込み(観察): 細部を一つずつ見る ---- */
+.examine-head {
+  margin-bottom: 20px;
+}
+
+.examine-title {
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.examine-intro {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--ink-dim);
+}
+
+.examine-hotspots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.examine-hotspot {
+  font-family: var(--serif);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: rgba(201, 169, 92, 0.06);
+  border: 1px solid rgba(201, 169, 92, 0.28);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.examine-hotspot:hover:not(:disabled) {
+  background: rgba(201, 169, 92, 0.16);
+  border-color: var(--gold);
+}
+
+.examine-hotspot.done {
+  color: var(--ink-dim);
+  border-color: rgba(201, 169, 92, 0.18);
+  cursor: default;
+}
+
+.examine-hotspot.hidden-spot {
+  border-style: dashed;
+  border-color: rgba(192, 128, 110, 0.6);
+  color: #d19685;
+}
+
+.examine-relook {
+  display: block;
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  letter-spacing: 0.1em;
+  color: #d19685;
+  background: rgba(192, 128, 110, 0.05);
+  border: 1px dashed rgba(192, 128, 110, 0.5);
+  padding: 11px 16px;
+  margin-top: 14px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.examine-relook:hover {
+  background: rgba(192, 128, 110, 0.12);
+}
+
+.examine-log {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 22px 0 26px;
+}
+
+.examine-note {
+  border-left: 2px solid rgba(201, 169, 92, 0.45);
+  padding: 2px 0 2px 16px;
+}
+
+.examine-note-label {
+  display: block;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: 5px;
+}
+
+.examine-note-text {
+  font-size: 14px;
+  line-height: 1.95;
+  color: var(--ink);
+}
+
+.examine-clue {
+  display: inline-block;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--paper);
+  background: var(--gold);
+  border-radius: 999px;
+  padding: 3px 12px;
+  margin-top: 9px;
+}
+
+.examine-done {
+  width: 100%;
+}
+
+/* ---- 人物との対話選択: 分岐する会話 ---- */
+.conversation-lines {
+  min-height: 96px;
+  margin-bottom: 22px;
+  cursor: pointer;
+}
+
+.conversation-line {
+  margin-bottom: 14px;
+}
+
+.conversation-speaker {
+  display: block;
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  margin-bottom: 5px;
+}
+
+.conversation-text {
+  font-size: 15.5px;
+  line-height: 2;
+  color: var(--ink);
+}
+
+.conversation-line.inner .conversation-text {
+  color: var(--ink-dim);
+  font-style: italic;
+}
+
+.conversation-caret {
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.conversation-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid rgba(201, 169, 92, 0.18);
+  padding-top: 20px;
+}
+
+.conversation-choice {
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  text-align: left;
+  color: var(--ink);
+  background: rgba(201, 169, 92, 0.06);
+  border: 1px solid rgba(201, 169, 92, 0.28);
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.conversation-choice:hover {
+  background: rgba(201, 169, 92, 0.16);
+  border-color: var(--gold);
+  transform: translateX(4px);
+}
+
+/* ---- その時代の行為(共通) ---- */
+.activity-prompt {
+  font-size: 15.5px;
+  line-height: 1.95;
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+}
+
+.activity-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.activity-secondary {
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  background: transparent;
+  border: 1px solid rgba(201, 169, 92, 0.28);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.activity-secondary:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.activity-actions .card-button {
+  margin-left: auto;
+}
+
+/* 行為(piano): 呼びかけの旋律をなぞる */
+.piano-slots {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.piano-slot {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 169, 92, 0.5);
+  background: transparent;
+}
+
+.piano-slot.hit {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.piano-slot.miss {
+  background: rgba(132, 150, 184, 0.5);
+  border-color: #8496b8;
+}
+
+.piano-keys {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.piano-key {
+  position: relative;
+  flex: 1 1 0;
+  height: 128px;
+  border: 1px solid rgba(201, 169, 92, 0.35);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+  transition: all 0.1s ease;
+}
+
+.piano-key.white {
+  background: linear-gradient(180deg, #efe7d2, #d9cfb4);
+}
+
+.piano-key.black {
+  background: linear-gradient(180deg, #2a2520, #17130f);
+  height: 96px;
+}
+
+.piano-key:hover {
+  filter: brightness(1.08);
+}
+
+.piano-key:active {
+  transform: translateY(2px);
+  filter: brightness(0.92);
+}
+
+.piano-key-label {
+  font-family: var(--serif);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: rgba(23, 19, 15, 0.55);
+}
+
+.piano-key.black .piano-key-label {
+  color: rgba(232, 224, 204, 0.5);
+}
+
+/* 行為(compose): 断片から手紙を組み上げる */
+.compose-fragments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.compose-fragment {
+  font-family: var(--serif);
+  text-align: left;
+  color: var(--ink);
+  background: rgba(201, 169, 92, 0.05);
+  border: 1px solid rgba(201, 169, 92, 0.24);
+  border-left: 3px solid transparent;
+  padding: 13px 18px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.compose-fragment:hover {
+  background: rgba(201, 169, 92, 0.12);
+}
+
+.compose-fragment.chosen {
+  border-left-color: var(--gold);
+  background: rgba(201, 169, 92, 0.12);
+}
+
+.compose-fragment.doubt {
+  border-left-color: #c0806e;
+  background: rgba(192, 128, 110, 0.08);
+}
+
+.compose-fragment.doubt .compose-fragment-text {
+  color: var(--ink-dim);
+  text-decoration: line-through;
+  text-decoration-color: rgba(192, 128, 110, 0.7);
+}
+
+.compose-fragment-text {
+  display: block;
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: 0.03em;
+}
+
+.compose-fragment-aside {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: #d19685;
+  margin-top: 8px;
+}
+
+.compose-preview {
+  border-top: 1px solid rgba(201, 169, 92, 0.18);
+  padding-top: 18px;
+}
+
+.compose-preview-label {
+  display: block;
+  font-size: 11.5px;
+  letter-spacing: 0.24em;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.compose-preview-line {
+  font-size: 14px;
+  line-height: 2;
+  color: var(--ink);
+  padding-left: 14px;
+  border-left: 2px solid rgba(201, 169, 92, 0.4);
+  margin-bottom: 8px;
+}
+
+.compose-preview-empty {
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-dim);
+}
+
+.compose-letter {
+  border-left: 2px solid rgba(201, 169, 92, 0.5);
+  padding: 6px 0 6px 20px;
+  margin: 18px 0 26px;
+}
+
+.compose-letter-line {
+  font-size: 15px;
+  line-height: 2.15;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.compose-letter-line:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-height: 480px) {
+  .examine-panel,
+  .conversation-panel,
+  .activity-panel {
+    padding: 22px 26px;
+  }
+  .activity-prompt {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .piano-key {
+    height: 92px;
+  }
+  .piano-key.black {
+    height: 68px;
+  }
+  .conversation-lines {
+    min-height: 64px;
+    margin-bottom: 14px;
+  }
+  .conversation-text {
+    font-size: 14px;
+  }
+  .examine-log {
+    margin: 14px 0 16px;
+  }
+}
+
 /* ---- 運命(聴力減衰)の幕間 ---- */
 .fate-layer {
   position: fixed;
@@ -722,7 +1579,7 @@ html.force-landscape #root {
 
 .hint-bar {
   position: fixed;
-  top: 18px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 12px;
@@ -734,6 +1591,100 @@ html.force-landscape #root {
   z-index: 15;
   pointer-events: none;
   white-space: nowrap;
+}
+
+/* ---- 目あてバー(探索中、いま何をすればいいかを常に示す) ---- */
+.goal-bar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--serif);
+  background: rgba(15, 13, 10, 0.72);
+  border: 1px solid rgba(201, 169, 92, 0.32);
+  border-radius: 3px;
+  padding: 8px 18px;
+  z-index: 40;
+  pointer-events: none;
+  max-width: min(94vw, 680px);
+  animation: fadein 0.6s ease;
+}
+
+.goal-label {
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.goal-text {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.goal-count {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ---- 手がかりトースト(拾った瞬間だけ右上に浮かぶ) ---- */
+.evidence-toast {
+  position: fixed;
+  top: 64px;
+  right: 14px;
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+  color: var(--ink);
+  background: rgba(15, 13, 10, 0.82);
+  border: 1px solid rgba(201, 169, 92, 0.5);
+  border-left: 3px solid var(--gold);
+  border-radius: 2px;
+  padding: 9px 14px;
+  z-index: 45;
+  pointer-events: none;
+  max-width: min(72vw, 340px);
+  animation: toastin 3.2s ease forwards;
+}
+
+@keyframes toastin {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  8% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- NPCの名札(頭上の小さな札) ---- */
+.npc-name {
+  font-family: var(--serif);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  color: rgba(232, 224, 204, 0.92);
+  background: rgba(15, 13, 10, 0.62);
+  border: 1px solid rgba(201, 169, 92, 0.35);
+  border-radius: 2px;
+  padding: 2px 9px;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* タッチ端末ではキーボード案内は無意味(D-pad+タップ操作)なので隠す */
